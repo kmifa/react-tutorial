@@ -16,28 +16,25 @@ class Board extends React.Component {
       <Square
         value={this.props.squares[i]}
         onClick={() => this.props.onClick(i)}
+        key={i}
       />
     )
   }
 
   render() {
+    const cols = [0, 1, 2];
+    const rows = [0, 1, 2];
     return (
       <div>
-        <div className="board-row">
-          {this.renderSquare(0)}
-          {this.renderSquare(1)}
-          {this.renderSquare(2)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(3)}
-          {this.renderSquare(4)}
-          {this.renderSquare(5)}
-        </div>
-        <div className="board-row">
-          {this.renderSquare(6)}
-          {this.renderSquare(7)}
-          {this.renderSquare(8)}
-        </div>
+        {
+          rows.map(row => {
+            return (
+              <div className="board-row" key={row}>
+                {cols.map(col => this.renderSquare(row * 3 + col))}
+              </div>
+            )
+          })
+        }
       </div>
     );
   }
@@ -49,6 +46,10 @@ class Game extends React.Component {
     this.state = {
       history: [{
         squares: Array(9).fill(null),
+        location: {
+          col: 0,
+          row: 0,
+        },
       }],
       stepNumber: 0,
       xIsNext: true,
@@ -72,6 +73,10 @@ class Game extends React.Component {
     this.setState({
       history: history.concat([{
         squares: squares,
+        location: {
+          col: i % 3,
+          row: Math.trunc(i / 3),
+        },
       }]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
@@ -89,20 +94,20 @@ class Game extends React.Component {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
-
     const moves = history.map((step, move) => {
-      console.log(move);
       const desc = move ?
-        'Go to move #' + move :
+        `Go to move #${move}(col, ${step.location.col}, row, ${step.location.row})`:
         'Go to game start';
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button
+            className={move === this.state.stepNumber ? 'text-bold' : ''}
+            onClick={() => this.jumpTo(move)}>
+            {desc}
+          </button>
         </li>
       );
     });
-
-
 
     let status;
     if (winner) {
