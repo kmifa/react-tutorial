@@ -53,3 +53,7 @@ ul {
 .text-bold {
   font-weight: bold;
 }
+
+.highlight {
+  background-color: yellow;
+}
